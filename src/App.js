@@ -63,6 +63,7 @@ function App() {
         <div id="content">
           {filteredArticles.map(article => {
             const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
+            console.log('Image URL:', imageUrl);  // Log the image URL for debugging
             return (
               <div key={article.id}>
                 <a href={imageUrl} download>
