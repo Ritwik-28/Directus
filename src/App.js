@@ -55,11 +55,16 @@ function App() {
         </select>
       </div>
       <div id="content">
-        {filteredArticles.map(article => (
-          <div key={article.id}>
-            <img src={`${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} />
-          </div>
-        ))}
+        {filteredArticles.map(article => {
+          const imageUrl = `${process.env.DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
+          return (
+            <div key={article.id}>
+              <a href={imageUrl} download>
+                <img src={imageUrl} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} />
+              </a>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
