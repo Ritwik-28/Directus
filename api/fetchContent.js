@@ -1,27 +1,29 @@
 const fetch = require('node-fetch');
 
+const directusApiEndpoint = process.env.REACT_APP_DIRECTUS_API_ENDPOINT;
+
 module.exports = async (req, res) => {
-  const apiEndpoint = process.env.DIRECTUS_API_ENDPOINT;
-  const collectionName = 'success_stories';
-  const token = req.query.token;
+  const { token } = req.query;
 
-  const url = `${apiEndpoint}/items/${collectionName}?filter[status][_eq]=published`;
-
-  const options = {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  };
+  if (!token) {
+    return res.status(400).json({ error: 'Token is required' });
+  }
 
   try {
-    const response = await fetch(url, options);
-    const data = await response.json();
+    const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-    if (!data.data) {
-      throw new Error('Failed to retrieve content data');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch content: ${response.statusText}`);
     }
 
+    const data = await response.json();
     res.status(200).json(data.data);
   } catch (error) {
+    console.error('Error fetching content:', error.message);
     res.status(500).json({ error: error.message });
   }
 };
