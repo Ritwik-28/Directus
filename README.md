@@ -1,4 +1,4 @@
-<h1 align="center">Directus Client React App</h1>h1>
+<h1 align="center">Directus Client React App</h1>
 
 <p align="justified">This is a React application that fetches and displays content from a Directus API. The application allows users to filter content by program and company, and download images by clicking on them.</p>
 
