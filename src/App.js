@@ -9,11 +9,15 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Environment Variable DIRECTUS_API_ENDPOINT:', process.env.DIRECTUS_API_ENDPOINT);
+
         const tokenRes = await fetch('/api/getAccessToken');
         const tokenData = await tokenRes.json();
+        console.log('Access Token:', tokenData.token);
 
         const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}`);
         const contentData = await contentRes.json();
+        console.log('Fetched Content:', contentData);
 
         setArticles(contentData);
         setPrograms([...new Set(contentData.map(article => article.program_detail))]);
@@ -57,13 +61,11 @@ function App() {
       <div id="content">
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          console.log('Base API Endpoint:', process.env.DIRECTUS_API_ENDPOINT);
-          console.log('Learner Image ID:', article.learner_image);
           console.log('Constructed Image URL:', imageUrl);
           return (
             <div key={article.id}>
               <a href={imageUrl} download>
-                <img src={imageUrl} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} />
+                <img src={imageUrl} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} />
               </a>
             </div>
           );
