@@ -57,6 +57,9 @@ function App() {
       <div id="content">
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
+          console.log('Base API Endpoint:', process.env.DIRECTUS_API_ENDPOINT);
+          console.log('Learner Image ID:', article.learner_image);
+          console.log('Constructed Image URL:', imageUrl);
           return (
             <div key={article.id}>
               <a href={imageUrl} download>
