@@ -42,7 +42,7 @@ To run this project, you will need to add the following environment variables to
 **.env**
 
 ```plaintext
-REACT_APP_DIRECTUS_API_ENDPOINT=https://directus.crio.do
+REACT_APP_DIRECTUS_API_ENDPOINT=https://your.directus.instance
 DIRECTUS_USERNAME=your_username
 DIRECTUS_PASSWORD=your_password
 ```
