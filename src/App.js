@@ -13,17 +13,23 @@ function App() {
         console.log('Environment Variable REACT_APP_DIRECTUS_API_ENDPOINT:', process.env.REACT_APP_DIRECTUS_API_ENDPOINT);
 
         const tokenRes = await fetch('/api/getAccessToken');
+        if (!tokenRes.ok) {
+          throw new Error('Failed to fetch access token');
+        }
         const tokenData = await tokenRes.json();
         console.log('Access Token:', tokenData.token);
 
         const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}`);
+        if (!contentRes.ok) {
+          throw new Error('Failed to fetch content');
+        }
         const contentData = await contentRes.json();
         console.log('Fetched Content:', contentData);
 
-        setArticles(contentData);
+        setArticles(Array.isArray(contentData) ? contentData : []);
         setPrograms([...new Set(contentData.map(article => article.program_detail))]);
         setCompanies([...new Set(contentData.map(article => article.company_name))]);
-        setFilteredArticles(contentData);
+        setFilteredArticles(Array.isArray(contentData) ? contentData : []);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
