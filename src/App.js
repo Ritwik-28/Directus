@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function App() {
   const [articles, setArticles] = useState([]);
@@ -41,38 +41,39 @@ function App() {
   };
 
   return (
-    <div>
+    <SpeedInsights>
       <div>
-        <label htmlFor="programFilter">Program:</label>
-        <select id="programFilter" onChange={(e) => filterContent(e.target.value, document.getElementById('companyFilter').value)}>
-          <option value="">All Programs</option>
-          {programs.map(program => (
-            <option key={program} value={program}>{program}</option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="programFilter">Program:</label>
+          <select id="programFilter" onChange={(e) => filterContent(e.target.value, document.getElementById('companyFilter').value)}>
+            <option value="">All Programs</option>
+            {programs.map(program => (
+              <option key={program} value={program}>{program}</option>
+            ))}
+          </select>
 
-        <label htmlFor="companyFilter">Company:</label>
-        <select id="companyFilter" onChange={(e) => filterContent(document.getElementById('programFilter').value, e.target.value)}>
-          <option value="">All Companies</option>
-          {companies.map(company => (
-            <option key={company} value={company}>{company}</option>
-          ))}
-        </select>
+          <label htmlFor="companyFilter">Company:</label>
+          <select id="companyFilter" onChange={(e) => filterContent(document.getElementById('programFilter').value, e.target.value)}>
+            <option value="">All Companies</option>
+            {companies.map(company => (
+              <option key={company} value={company}>{company}</option>
+            ))}
+          </select>
+        </div>
+        <div id="content">
+          {filteredArticles.map(article => {
+            const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
+            return (
+              <div key={article.id}>
+                <a href={imageUrl} download>
+                  <img src={imageUrl} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} />
+                </a>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div id="content">
-        {filteredArticles.map(article => {
-          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          console.log('Constructed Image URL:', imageUrl);
-          return (
-            <div key={article.id}>
-              <a href={imageUrl} download>
-                <img src={imageUrl} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} />
-              </a>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    </SpeedInsights>
   );
 }
 
