@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Environment Variable DIRECTUS_API_ENDPOINT:', process.env.DIRECTUS_API_ENDPOINT);
+        console.log('Environment Variable REACT_APP_DIRECTUS_API_ENDPOINT:', process.env.REACT_APP_DIRECTUS_API_ENDPOINT);
 
         const tokenRes = await fetch('/api/getAccessToken');
         const tokenData = await tokenRes.json();
