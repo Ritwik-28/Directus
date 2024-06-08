@@ -1,7 +1,6 @@
+<h1 align="center">Directus Client React App</h1>h1>
 
-# Directus Client React App
-
-This is a React application that fetches and displays content from a Directus API. The application allows users to filter content by program and company, and download images by clicking on them.
+<p align="justified">This is a React application that fetches and displays content from a Directus API. The application allows users to filter content by program and company, and download images by clicking on them.</p>
 
 ## Table of Contents
 
@@ -61,10 +60,6 @@ These environment variables must also be set in your deployment platform (e.g., 
    - `DIRECTUS_PASSWORD`
 
 3. **Vercel will automatically deploy your project** after you import and configure it.
-
-### Example of Environment Variables on Vercel
-
-![Vercel Environment Variables](https://github.com/Ritwik-28/directus-client/blob/main/vercel-env-vars.png)
 
 ### Build and Deploy
 
