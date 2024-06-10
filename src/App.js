@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Select from 'react-select';
 import './App.css';
 import { format } from 'date-fns';
 
 function App() {
   const [articles, setArticles] = useState([]);
-  const [programs, setPrograms] = useState([]);
-  const [companies, setCompanies] = useState([]);
-  const [months, setMonths] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
+  const [filters, setFilters] = useState({ program: '', company: '', month: '' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,13 +25,6 @@ function App() {
 
         const articlesData = Array.isArray(contentData) ? contentData : [];
         setArticles(articlesData);
-        setPrograms([...new Set(articlesData.map(article => article.program_detail))]);
-        setCompanies([...new Set(articlesData.map(article => article.company_name))]);
-
-        // Extract and format the months
-        const monthsData = [...new Set(articlesData.map(article => format(new Date(article.month), 'MMMM yyyy')))];
-        monthsData.sort((a, b) => new Date(b) - new Date(a));
-        setMonths(monthsData);
         setFilteredArticles(articlesData);
 
       } catch (error) {
@@ -44,29 +35,25 @@ function App() {
     fetchData();
   }, []);
 
-  const filterContent = (programFilter, companyFilter, monthFilter) => {
-    const filtered = articles.filter(article => {
-      const articleMonth = format(new Date(article.month), 'MMMM yyyy');
-      return (!programFilter || article.program_detail === programFilter) &&
-             (!companyFilter || article.company_name === companyFilter) &&
-             (!monthFilter || articleMonth === monthFilter);
-    });
-    setFilteredArticles(filtered);
-  };
+  useEffect(() => {
+    const filterContent = () => {
+      const filtered = articles.filter(article => {
+        const articleMonth = format(new Date(article.month), 'MMMM yyyy');
+        return (!filters.program || article.program_detail === filters.program) &&
+               (!filters.company || article.company_name === filters.company) &&
+               (!filters.month || articleMonth === filters.month);
+      });
+      setFilteredArticles(filtered);
+    };
 
-  const handleProgramChange = (selectedOption) => {
-    const programFilter = selectedOption ? selectedOption.value : '';
-    filterContent(programFilter, document.getElementById('companyFilter').value, document.getElementById('monthFilter').value);
-  };
+    filterContent();
+  }, [filters, articles]);
 
-  const handleCompanyChange = (selectedOption) => {
-    const companyFilter = selectedOption ? selectedOption.value : '';
-    filterContent(document.getElementById('programFilter').value, companyFilter, document.getElementById('monthFilter').value);
-  };
-
-  const handleMonthChange = (selectedOption) => {
-    const monthFilter = selectedOption ? selectedOption.value : '';
-    filterContent(document.getElementById('programFilter').value, document.getElementById('companyFilter').value, monthFilter);
+  const handleFilterChange = (selectedOption, filterType) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [filterType]: selectedOption ? selectedOption.value : ''
+    }));
   };
 
   const downloadImage = (url) => {
@@ -78,28 +65,39 @@ function App() {
     document.body.removeChild(link);
   };
 
-  const programOptions = programs.map(program => ({
+  const filteredPrograms = useMemo(() => {
+    return [...new Set(filteredArticles.map(article => article.program_detail))];
+  }, [filteredArticles]);
+
+  const filteredCompanies = useMemo(() => {
+    return [...new Set(filteredArticles.map(article => article.company_name))];
+  }, [filteredArticles]);
+
+  const filteredMonths = useMemo(() => {
+    return [...new Set(filteredArticles.map(article => format(new Date(article.month), 'MMMM yyyy')))];
+  }, [filteredArticles]);
+
+  const programOptions = useMemo(() => filteredPrograms.map(program => ({
     value: program,
     label: program
-  }));
+  })), [filteredPrograms]);
 
-  const companyOptions = companies.map(company => ({
+  const companyOptions = useMemo(() => filteredCompanies.map(company => ({
     value: company,
     label: company
-  }));
+  })), [filteredCompanies]);
 
-  const monthOptions = months.map(month => ({
+  const monthOptions = useMemo(() => filteredMonths.map(month => ({
     value: month,
     label: month
-  }));
+  })), [filteredMonths]);
 
   return (
     <div className="container">
       <div className="filters">
         <Select 
-          id="programFilter" 
           options={programOptions} 
-          onChange={handleProgramChange}
+          onChange={selectedOption => handleFilterChange(selectedOption, 'program')}
           isClearable 
           placeholder="Select Program Name" 
           className="custom-select"
@@ -107,9 +105,8 @@ function App() {
         />
 
         <Select 
-          id="companyFilter" 
           options={companyOptions} 
-          onChange={handleCompanyChange} 
+          onChange={selectedOption => handleFilterChange(selectedOption, 'company')} 
           isClearable 
           placeholder="Search Company Name" 
           className="custom-select"
@@ -117,9 +114,8 @@ function App() {
         />
 
         <Select 
-          id="monthFilter" 
           options={monthOptions} 
-          onChange={handleMonthChange} 
+          onChange={selectedOption => handleFilterChange(selectedOption, 'month')} 
           isClearable 
           placeholder="Select Placement Month" 
           className="custom-select"
