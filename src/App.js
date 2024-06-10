@@ -127,17 +127,21 @@ function App() {
       </div>
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
-          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.asset_image}`;
+          const imageUrl = article.asset_image 
+            ? `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.asset_image}`
+            : null;
           console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
             <div className="image-container" key={article.id}>
-              <img 
-                src={imageUrl} 
-                alt={article.program_name ? article.program_name.join(', ') : 'No Image'} 
-                style={{ maxWidth: '200px', height: 'auto' }} 
-                onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }}
-                onClick={() => downloadImage(imageUrl)}
-              />
+              {imageUrl && (
+                <img 
+                  src={imageUrl} 
+                  alt={article.program_name ? article.program_name.join(', ') : 'No Image'} 
+                  style={{ maxWidth: '200px', height: 'auto' }} 
+                  onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }}
+                  onClick={() => downloadImage(imageUrl)}
+                />
+              )}
               <div className="tooltip">Click to download</div>
             </div>
           );
