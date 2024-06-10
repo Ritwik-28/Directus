@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
   const [articles, setArticles] = useState([]);
@@ -45,9 +46,26 @@ function App() {
     setFilteredArticles(filtered);
   };
 
+  const handleSearch = (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    const filtered = articles.filter(article =>
+      article.company_name.toLowerCase().includes(searchTerm)
+    );
+    setFilteredArticles(filtered);
+  };
+
+  const downloadImage = (url) => {
+    const link = document.createElement('a');
+    link.href = `${url}?download=true`; // Assuming Directus supports this
+    link.download = url.substring(url.lastIndexOf('/') + 1);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div>
-      <div>
+    <div className="container">
+      <div className="filters">
         <label htmlFor="programFilter">Program:</label>
         <select id="programFilter" onChange={(e) => filterContent(e.target.value, document.getElementById('companyFilter').value)}>
           <option value="">All Programs</option>
@@ -57,22 +75,27 @@ function App() {
         </select>
 
         <label htmlFor="companyFilter">Company:</label>
-        <select id="companyFilter" onChange={(e) => filterContent(document.getElementById('programFilter').value, e.target.value)}>
-          <option value="">All Companies</option>
-          {companies.map(company => (
-            <option key={company} value={company}>{company}</option>
-          ))}
-        </select>
+        <input 
+          type="text" 
+          id="companySearch" 
+          placeholder="Search company..." 
+          onChange={handleSearch}
+        />
       </div>
-      <div id="content">
+      <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
-            <div key={article.id}>
-              <a href={imageUrl} download>
-                <img src={imageUrl} alt={article.program_detail || 'No Image'} style={{ maxWidth: '200px', height: 'auto' }} onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} />
-              </a>
+            <div className="image-container" key={article.id}>
+              <img 
+                src={imageUrl} 
+                alt={article.program_detail || 'No Image'} 
+                style={{ maxWidth: '200px', height: 'auto' }} 
+                onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }}
+                onClick={() => downloadImage(imageUrl)}
+              />
+              <div className="tooltip">Click to download</div>
             </div>
           );
         })}
