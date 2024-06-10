@@ -13,21 +13,17 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Environment Variable REACT_APP_DIRECTUS_API_ENDPOINT:', process.env.REACT_APP_DIRECTUS_API_ENDPOINT);
-
         const tokenRes = await fetch('/api/getAccessToken');
         if (!tokenRes.ok) {
           throw new Error('Failed to fetch access token');
         }
         const tokenData = await tokenRes.json();
-        console.log('Access Token:', tokenData.token);
 
         const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}`);
         if (!contentRes.ok) {
           throw new Error('Failed to fetch content');
         }
         const contentData = await contentRes.json();
-        console.log('Fetched Content:', contentData);
 
         const articlesData = Array.isArray(contentData) ? contentData : [];
         setArticles(articlesData);
@@ -35,7 +31,7 @@ function App() {
         setCompanies([...new Set(articlesData.map(article => article.company_name))]);
 
         // Extract and format the months
-        const monthsData = [...new Set(articlesData.map(article => format(new Date(article.date_created), 'MMMM yyyy')))];
+        const monthsData = [...new Set(articlesData.map(article => format(new Date(article.month), 'MMMM yyyy')))];
         setMonths(monthsData);
         setFilteredArticles(articlesData);
 
@@ -49,7 +45,7 @@ function App() {
 
   const filterContent = (programFilter, companyFilter, monthFilter) => {
     const filtered = articles.filter(article => {
-      const articleMonth = format(new Date(article.date_created), 'MMMM yyyy');
+      const articleMonth = format(new Date(article.month), 'MMMM yyyy');
       return (!programFilter || article.program_detail === programFilter) &&
              (!companyFilter || article.company_name === companyFilter) &&
              (!monthFilter || articleMonth === monthFilter);
@@ -74,7 +70,7 @@ function App() {
 
   const downloadImage = (url) => {
     const link = document.createElement('a');
-    link.href = `${url}?download=true`; // Assuming Directus supports this
+    link.href = `${url}?download=true`;
     link.download = url.substring(url.lastIndexOf('/') + 1);
     document.body.appendChild(link);
     link.click();
@@ -104,7 +100,7 @@ function App() {
           options={programOptions} 
           onChange={handleProgramChange}
           isClearable 
-          placeholder="Select program..." 
+          placeholder="Select Program Name" 
           className="custom-select"
         />
 
@@ -113,7 +109,7 @@ function App() {
           options={companyOptions} 
           onChange={handleCompanyChange} 
           isClearable 
-          placeholder="Search company..." 
+          placeholder="Search Company Name" 
           className="custom-select"
         />
 
@@ -122,21 +118,20 @@ function App() {
           options={monthOptions} 
           onChange={handleMonthChange} 
           isClearable 
-          placeholder="Select month..." 
+          placeholder="Select Placement Month" 
           className="custom-select"
         />
       </div>
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
             <div className="image-container" key={article.id}>
               <img 
                 src={imageUrl} 
                 alt={article.program_detail || 'No Image'} 
                 style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
-                onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} 
+                onError={(e) => { e.target.style.display = 'none'; }} 
                 onClick={() => downloadImage(imageUrl)}
               />
               <div className="tooltip">Click to download</div>
