@@ -132,15 +132,13 @@ function App() {
           console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
             <div className="image-container" key={article.id}>
-              <a href={imageUrl} download>
-                <img 
-                  src={imageUrl} 
-                  alt={article.program_detail || 'No Image'} 
-                  style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
-                  onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} 
-                  onClick={() => downloadImage(imageUrl)}
-                />
-              </a>
+              <img 
+                src={imageUrl} 
+                alt={article.program_detail || 'No Image'} 
+                style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
+                onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} 
+                onClick={() => downloadImage(imageUrl)}
+              />
               <div className="tooltip">Click to download</div>
             </div>
           );
