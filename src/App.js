@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Select from 'react-select';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import './App.css';
 import { format } from 'date-fns';
-
-const getItemsPerPage = () => {
-  const itemHeight = 250; // Estimate height of each item in pixels
-  const viewportHeight = window.innerHeight;
-  return Math.floor(viewportHeight / itemHeight);
-};
 
 function App() {
   const [articles, setArticles] = useState([]);
@@ -19,7 +13,9 @@ function App() {
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [displayedArticles, setDisplayedArticles] = useState([]);
   const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage());
+  const [itemsPerPage, setItemsPerPage] = useState(0);
+  const observer = useRef();
+  const itemRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,26 +41,44 @@ function App() {
         monthsData.sort((a, b) => new Date(b) - new Date(a));
         setMonths(monthsData);
         setFilteredArticles(articlesData);
-        setDisplayedArticles(articlesData.slice(0, itemsPerPage));
-
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, [itemsPerPage]);
+  }, []);
+
+  useEffect(() => {
+    if (itemRef.current) {
+      const itemHeight = itemRef.current.clientHeight;
+      const viewportHeight = window.innerHeight;
+      const calculatedItemsPerPage = Math.floor(viewportHeight / itemHeight);
+      setItemsPerPage(calculatedItemsPerPage);
+
+      // Initialize displayed articles
+      setDisplayedArticles(filteredArticles.slice(0, calculatedItemsPerPage));
+    }
+  }, [filteredArticles]);
 
   useEffect(() => {
     const handleResize = () => {
-      setItemsPerPage(getItemsPerPage());
+      if (itemRef.current) {
+        const itemHeight = itemRef.current.clientHeight;
+        const viewportHeight = window.innerHeight;
+        const calculatedItemsPerPage = Math.floor(viewportHeight / itemHeight);
+        setItemsPerPage(calculatedItemsPerPage);
+
+        // Recalculate displayed articles
+        setDisplayedArticles(filteredArticles.slice(0, calculatedItemsPerPage * page));
+      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [filteredArticles, page]);
 
   const filterContent = (programFilter, companyFilter, monthFilter) => {
     const filtered = articles.filter(article => {
@@ -93,13 +107,23 @@ function App() {
     filterContent(document.getElementById('programFilter').value, document.getElementById('companyFilter').value, monthFilter);
   };
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     const nextPage = page + 1;
     const start = page * itemsPerPage;
     const end = start + itemsPerPage;
     setDisplayedArticles(prev => [...prev, ...filteredArticles.slice(start, end)]);
     setPage(nextPage);
-  };
+  }, [page, itemsPerPage, filteredArticles]);
+
+  const lastArticleRef = useCallback(node => {
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        loadMore();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadMore]);
 
   const downloadImage = (url) => {
     const link = document.createElement('a');
@@ -161,26 +185,52 @@ function App() {
       <div className="images-grid" id="imagesGrid">
         {displayedArticles.map((article, index) => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          return (
-            <div className="image-container" key={article.id}>
-              <LazyLoadImage
-                src={imageUrl}
-                alt={article.program_detail || 'No Image'}
-                effect="blur"
-                style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
-                onError={(e) => { e.target.style.display = 'none'; }}
-                onClick={() => downloadImage(imageUrl)}
-              />
-              <div className="tooltip">Click to download</div>
-            </div>
-          );
+          if (index === 0) {
+            return (
+              <div className="image-container" key={article.id} ref={itemRef}>
+                <LazyLoadImage
+                  src={imageUrl}
+                  alt={article.program_detail || 'No Image'}
+                  effect="blur"
+                  style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                  onClick={() => downloadImage(imageUrl)}
+                />
+                <div className="tooltip">Click to download</div>
+              </div>
+            );
+          }
+          if (index === displayedArticles.length - 1) {
+            return (
+              <div className="image-container" key={article.id} ref={lastArticleRef}>
+                <LazyLoadImage
+                  src={imageUrl}
+                  alt={article.program_detail || 'No Image'}
+                  effect="blur"
+                  style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                  onClick={() => downloadImage(imageUrl)}
+                />
+                <div className="tooltip">Click to download</div>
+              </div>
+            );
+          } else {
+            return (
+              <div className="image-container" key={article.id}>
+                <LazyLoadImage
+                  src={imageUrl}
+                  alt={article.program_detail || 'No Image'}
+                  effect="blur"
+                  style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                  onClick={() => downloadImage(imageUrl)}
+                />
+                <div className="tooltip">Click to download</div>
+              </div>
+            );
+          }
         })}
       </div>
-      {displayedArticles.length < filteredArticles.length && (
-        <button onClick={loadMore} className="load-more-button">
-          Load More
-        </button>
-      )}
     </div>
   );
 }
