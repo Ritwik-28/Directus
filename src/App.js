@@ -101,7 +101,7 @@ function App() {
           options={programOptions} 
           onChange={handleProgramChange}
           isClearable 
-          placeholder="Select Program Name..." 
+          placeholder="Select Program Name" 
           className="custom-select"
           classNamePrefix="custom-select"
         />
@@ -111,7 +111,7 @@ function App() {
           options={companyOptions} 
           onChange={handleCompanyChange} 
           isClearable 
-          placeholder="Search Company Name..." 
+          placeholder="Search Company Name" 
           className="custom-select"
           classNamePrefix="custom-select"
         />
@@ -121,7 +121,7 @@ function App() {
           options={monthOptions} 
           onChange={handleMonthChange} 
           isClearable 
-          placeholder="Select Placement Month..." 
+          placeholder="Select Placement Month" 
           className="custom-select"
           classNamePrefix="custom-select"
         />

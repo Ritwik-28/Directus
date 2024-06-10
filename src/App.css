@@ -28,6 +28,9 @@ body {
   background-color: #fff;
   color: #333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  white-space: nowrap; /* Ensures text stays on one line */
+  overflow: hidden; /* Hides any overflow */
+  text-overflow: ellipsis; /* Adds ellipsis for overflow text */
 }
 
 .images-grid {
