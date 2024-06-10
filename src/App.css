@@ -20,7 +20,7 @@ body {
 }
 
 .custom-select {
-  width: 200px;
+  min-width: 200px;
   font-size: 16px;
   border-radius: 8px;
   padding: 10px;
@@ -31,6 +31,21 @@ body {
   white-space: nowrap; /* Ensures text stays on one line */
   overflow: hidden; /* Hides any overflow */
   text-overflow: ellipsis; /* Adds ellipsis for overflow text */
+  display: inline-block;
+}
+
+.custom-select select {
+  border: none;
+  background: none;
+  width: 100%;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: inherit;
 }
 
 .images-grid {
