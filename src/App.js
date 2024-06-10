@@ -89,7 +89,7 @@ function App() {
           onChange={handleSearch} 
           isClearable 
           placeholder="Search company..." 
-          className="custom-select"
+          className="search-select"
         />
       </div>
       <div className="images-grid" id="imagesGrid">

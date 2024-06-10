@@ -19,12 +19,15 @@ body {
   gap: 20px;
 }
 
-.custom-select {
+.custom-select, .search-select {
   width: 200px;
   font-size: 16px;
   border-radius: 8px;
   padding: 10px;
   border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .images-grid {
@@ -39,9 +42,8 @@ body {
   padding: 10px;
   box-sizing: border-box;
   position: relative;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 8px;  /* Added for rounded edges */
+  overflow: hidden;    /* Added for rounded edges */
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -49,6 +51,7 @@ body {
   width: 100%;
   height: auto;
   display: block;
+  border-radius: 8px; /* Added for rounded edges */
 }
 
 .image-container:hover {
