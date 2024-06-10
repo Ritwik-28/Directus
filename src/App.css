@@ -42,8 +42,8 @@ body {
   padding: 10px;
   box-sizing: border-box;
   position: relative;
-  border-radius: 8px;  /* Added for rounded edges */
-  overflow: hidden;    /* Added for rounded edges */
+  border-radius: 8px;
+  overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -51,7 +51,7 @@ body {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 8px; /* Added for rounded edges */
+  border-radius: 8px;
 }
 
 .image-container:hover {

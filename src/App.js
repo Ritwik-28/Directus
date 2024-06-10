@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import './App.css';
-import { format } from 'date-fns'; // Import date-fns for formatting dates
+import { format } from 'date-fns';
 
 function App() {
   const [articles, setArticles] = useState([]);
@@ -31,16 +31,13 @@ function App() {
 
         const articlesData = Array.isArray(contentData) ? contentData : [];
         setArticles(articlesData);
-        setPrograms([...new Set(articlesData.flatMap(article => article.program_name))]);
+        setPrograms([...new Set(articlesData.map(article => article.program_detail))]);
         setCompanies([...new Set(articlesData.map(article => article.company_name))]);
 
         // Extract and format the months
         const monthsData = [...new Set(articlesData.map(article => format(new Date(article.date_created), 'MMMM yyyy')))];
         setMonths(monthsData);
         setFilteredArticles(articlesData);
-
-        // Log each article to verify asset_image
-        articlesData.forEach(article => console.log(article));
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -53,7 +50,7 @@ function App() {
   const filterContent = (programFilter, companyFilter, monthFilter) => {
     const filtered = articles.filter(article => {
       const articleMonth = format(new Date(article.date_created), 'MMMM yyyy');
-      return (!programFilter || article.program_name.includes(programFilter)) &&
+      return (!programFilter || article.program_detail === programFilter) &&
              (!companyFilter || article.company_name === companyFilter) &&
              (!monthFilter || articleMonth === monthFilter);
     });
@@ -131,23 +128,19 @@ function App() {
       </div>
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
-          const imageUrl = article.asset_image 
-            ? `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.asset_image}`
-            : null;
+          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
             <div className="image-container" key={article.id}>
-              {imageUrl ? (
+              <a href={imageUrl} download>
                 <img 
                   src={imageUrl} 
-                  alt={article.program_name ? article.program_name.join(', ') : 'No Image'} 
-                  style={{ maxWidth: '200px', height: 'auto' }} 
-                  onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }}
+                  alt={article.program_detail || 'No Image'} 
+                  style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
+                  onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }} 
                   onClick={() => downloadImage(imageUrl)}
                 />
-              ) : (
-                <p>No Image Available</p>
-              )}
+              </a>
               <div className="tooltip">Click to download</div>
             </div>
           );
