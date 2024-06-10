@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 import './App.css';
 import { format } from 'date-fns';
+
+const getItemsPerPage = () => {
+  const itemHeight = 250; // Estimate height of each item in pixels
+  const viewportHeight = window.innerHeight;
+  return Math.floor(viewportHeight / itemHeight);
+};
 
 function App() {
   const [articles, setArticles] = useState([]);
@@ -9,6 +17,9 @@ function App() {
   const [companies, setCompanies] = useState([]);
   const [months, setMonths] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
+  const [displayedArticles, setDisplayedArticles] = useState([]);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,11 +41,11 @@ function App() {
         setPrograms([...new Set(articlesData.map(article => article.program_detail))]);
         setCompanies([...new Set(articlesData.map(article => article.company_name))]);
 
-        // Extract and format the months
         const monthsData = [...new Set(articlesData.map(article => format(new Date(article.month), 'MMMM yyyy')))];
         monthsData.sort((a, b) => new Date(b) - new Date(a));
         setMonths(monthsData);
         setFilteredArticles(articlesData);
+        setDisplayedArticles(articlesData.slice(0, itemsPerPage));
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -42,6 +53,17 @@ function App() {
     };
 
     fetchData();
+  }, [itemsPerPage]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerPage(getItemsPerPage());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const filterContent = (programFilter, companyFilter, monthFilter) => {
@@ -52,6 +74,8 @@ function App() {
              (!monthFilter || articleMonth === monthFilter);
     });
     setFilteredArticles(filtered);
+    setDisplayedArticles(filtered.slice(0, itemsPerPage));
+    setPage(1);
   };
 
   const handleProgramChange = (selectedOption) => {
@@ -67,6 +91,14 @@ function App() {
   const handleMonthChange = (selectedOption) => {
     const monthFilter = selectedOption ? selectedOption.value : '';
     filterContent(document.getElementById('programFilter').value, document.getElementById('companyFilter').value, monthFilter);
+  };
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    const start = page * itemsPerPage;
+    const end = start + itemsPerPage;
+    setDisplayedArticles(prev => [...prev, ...filteredArticles.slice(start, end)]);
+    setPage(nextPage);
   };
 
   const downloadImage = (url) => {
@@ -127,15 +159,16 @@ function App() {
         />
       </div>
       <div className="images-grid" id="imagesGrid">
-        {filteredArticles.map(article => {
+        {displayedArticles.map((article, index) => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           return (
             <div className="image-container" key={article.id}>
-              <img 
-                src={imageUrl} 
-                alt={article.program_detail || 'No Image'} 
-                style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
-                onError={(e) => { e.target.style.display = 'none'; }} 
+              <LazyLoadImage
+                src={imageUrl}
+                alt={article.program_detail || 'No Image'}
+                effect="blur"
+                style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
+                onError={(e) => { e.target.style.display = 'none'; }}
                 onClick={() => downloadImage(imageUrl)}
               />
               <div className="tooltip">Click to download</div>
@@ -143,6 +176,11 @@ function App() {
           );
         })}
       </div>
+      {displayedArticles.length < filteredArticles.length && (
+        <button onClick={loadMore} className="load-more-button">
+          Load More
+        </button>
+      )}
     </div>
   );
 }
