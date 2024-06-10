@@ -50,7 +50,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (itemRef.current) {
+    if (filteredArticles.length && itemRef.current) {
       const itemHeight = itemRef.current.clientHeight;
       const viewportHeight = window.innerHeight;
       const calculatedItemsPerPage = Math.floor(viewportHeight / itemHeight);
@@ -88,7 +88,9 @@ function App() {
              (!monthFilter || articleMonth === monthFilter);
     });
     setFilteredArticles(filtered);
-    setDisplayedArticles(filtered.slice(0, itemsPerPage));
+    if (itemsPerPage) {
+      setDisplayedArticles(filtered.slice(0, itemsPerPage));
+    }
     setPage(1);
   };
 
