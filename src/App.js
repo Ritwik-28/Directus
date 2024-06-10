@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 import './App.css';
 
 function App() {
@@ -46,8 +47,8 @@ function App() {
     setFilteredArticles(filtered);
   };
 
-  const handleSearch = (event) => {
-    const searchTerm = event.target.value.toLowerCase();
+  const handleSearch = (selectedOption) => {
+    const searchTerm = selectedOption ? selectedOption.value.toLowerCase() : '';
     const filtered = articles.filter(article =>
       article.company_name.toLowerCase().includes(searchTerm)
     );
@@ -63,23 +64,32 @@ function App() {
     document.body.removeChild(link);
   };
 
+  const companyOptions = companies.map(company => ({
+    value: company,
+    label: company
+  }));
+
   return (
     <div className="container">
       <div className="filters">
-        <label htmlFor="programFilter">Program:</label>
-        <select id="programFilter" onChange={(e) => filterContent(e.target.value, document.getElementById('companyFilter').value)}>
+        <select 
+          id="programFilter" 
+          onChange={(e) => filterContent(e.target.value, document.getElementById('companyFilter').value)}
+          className="custom-select"
+        >
           <option value="">All Programs</option>
           {programs.map(program => (
             <option key={program} value={program}>{program}</option>
           ))}
         </select>
 
-        <label htmlFor="companyFilter">Company:</label>
-        <input 
-          type="text" 
-          id="companySearch" 
+        <Select 
+          id="companyFilter" 
+          options={companyOptions} 
+          onChange={handleSearch} 
+          isClearable 
           placeholder="Search company..." 
-          onChange={handleSearch}
+          className="custom-select"
         />
       </div>
       <div className="images-grid" id="imagesGrid">
