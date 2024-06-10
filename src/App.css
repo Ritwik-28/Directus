@@ -20,7 +20,7 @@ body {
 }
 
 .custom-select {
-  min-width: 200px; /* Ensures a minimum width */
+  width: 200px;
   font-size: 16px;
   border-radius: 8px;
   padding: 10px;
@@ -28,22 +28,6 @@ body {
   background-color: #fff;
   color: #333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  white-space: nowrap; /* Ensures text stays on one line */
-  overflow: hidden; /* Hides any overflow */
-  text-overflow: ellipsis; /* Adds ellipsis for overflow text */
-}
-
-.custom-select select {
-  width: 100%;
-  font-size: inherit;
-  border: none;
-  background: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  appearance: none;
-  color: inherit;
 }
 
 .images-grid {
