@@ -38,6 +38,10 @@ function App() {
         const monthsData = [...new Set(articlesData.map(article => format(new Date(article.date_created), 'MMMM yyyy')))];
         setMonths(monthsData);
         setFilteredArticles(articlesData);
+
+        // Log each article to verify asset_image
+        articlesData.forEach(article => console.log(article));
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -133,7 +137,7 @@ function App() {
           console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
             <div className="image-container" key={article.id}>
-              {imageUrl && (
+              {imageUrl ? (
                 <img 
                   src={imageUrl} 
                   alt={article.program_name ? article.program_name.join(', ') : 'No Image'} 
@@ -141,6 +145,8 @@ function App() {
                   onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }}
                   onClick={() => downloadImage(imageUrl)}
                 />
+              ) : (
+                <p>No Image Available</p>
               )}
               <div className="tooltip">Click to download</div>
             </div>
