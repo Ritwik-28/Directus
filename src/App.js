@@ -32,6 +32,7 @@ function App() {
 
         // Extract and format the months
         const monthsData = [...new Set(articlesData.map(article => format(new Date(article.month), 'MMMM yyyy')))];
+        monthsData.sort((a, b) => new Date(b) - new Date(a));
         setMonths(monthsData);
         setFilteredArticles(articlesData);
 
@@ -100,8 +101,9 @@ function App() {
           options={programOptions} 
           onChange={handleProgramChange}
           isClearable 
-          placeholder="Select Program Name" 
+          placeholder="Select Program Name..." 
           className="custom-select"
+          classNamePrefix="custom-select"
         />
 
         <Select 
@@ -109,8 +111,9 @@ function App() {
           options={companyOptions} 
           onChange={handleCompanyChange} 
           isClearable 
-          placeholder="Search Company Name" 
+          placeholder="Search Company Name..." 
           className="custom-select"
+          classNamePrefix="custom-select"
         />
 
         <Select 
@@ -118,8 +121,9 @@ function App() {
           options={monthOptions} 
           onChange={handleMonthChange} 
           isClearable 
-          placeholder="Select Placement Month" 
+          placeholder="Select Placement Month..." 
           className="custom-select"
+          classNamePrefix="custom-select"
         />
       </div>
       <div className="images-grid" id="imagesGrid">
