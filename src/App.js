@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import './App.css';
+import { format } from 'date-fns'; // Import date-fns for formatting dates
 
 function App() {
   const [articles, setArticles] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [months, setMonths] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
 
   useEffect(() => {
@@ -27,10 +29,15 @@ function App() {
         const contentData = await contentRes.json();
         console.log('Fetched Content:', contentData);
 
-        setArticles(Array.isArray(contentData) ? contentData : []);
-        setPrograms([...new Set(contentData.map(article => article.program_detail))]);
-        setCompanies([...new Set(contentData.map(article => article.company_name))]);
-        setFilteredArticles(Array.isArray(contentData) ? contentData : []);
+        const articlesData = Array.isArray(contentData) ? contentData : [];
+        setArticles(articlesData);
+        setPrograms([...new Set(articlesData.flatMap(article => article.program_name))]);
+        setCompanies([...new Set(articlesData.map(article => article.company_name))]);
+
+        // Extract and format the months
+        const monthsData = [...new Set(articlesData.map(article => format(new Date(article.date_created), 'MMMM yyyy')))];
+        setMonths(monthsData);
+        setFilteredArticles(articlesData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -39,20 +46,29 @@ function App() {
     fetchData();
   }, []);
 
-  const filterContent = (programFilter, companyFilter) => {
+  const filterContent = (programFilter, companyFilter, monthFilter) => {
     const filtered = articles.filter(article => {
-      return (!programFilter || article.program_detail === programFilter) &&
-             (!companyFilter || article.company_name === companyFilter);
+      const articleMonth = format(new Date(article.date_created), 'MMMM yyyy');
+      return (!programFilter || article.program_name.includes(programFilter)) &&
+             (!companyFilter || article.company_name === companyFilter) &&
+             (!monthFilter || articleMonth === monthFilter);
     });
     setFilteredArticles(filtered);
   };
 
-  const handleSearch = (selectedOption) => {
-    const searchTerm = selectedOption ? selectedOption.value.toLowerCase() : '';
-    const filtered = articles.filter(article =>
-      article.company_name.toLowerCase().includes(searchTerm)
-    );
-    setFilteredArticles(filtered);
+  const handleProgramChange = (selectedOption) => {
+    const programFilter = selectedOption ? selectedOption.value : '';
+    filterContent(programFilter, document.getElementById('companyFilter').value, document.getElementById('monthFilter').value);
+  };
+
+  const handleCompanyChange = (selectedOption) => {
+    const companyFilter = selectedOption ? selectedOption.value : '';
+    filterContent(document.getElementById('programFilter').value, companyFilter, document.getElementById('monthFilter').value);
+  };
+
+  const handleMonthChange = (selectedOption) => {
+    const monthFilter = selectedOption ? selectedOption.value : '';
+    filterContent(document.getElementById('programFilter').value, document.getElementById('companyFilter').value, monthFilter);
   };
 
   const downloadImage = (url) => {
@@ -64,43 +80,60 @@ function App() {
     document.body.removeChild(link);
   };
 
+  const programOptions = programs.map(program => ({
+    value: program,
+    label: program
+  }));
+
   const companyOptions = companies.map(company => ({
     value: company,
     label: company
   }));
 
+  const monthOptions = months.map(month => ({
+    value: month,
+    label: month
+  }));
+
   return (
     <div className="container">
       <div className="filters">
-        <select 
+        <Select 
           id="programFilter" 
-          onChange={(e) => filterContent(e.target.value, document.getElementById('companyFilter').value)}
+          options={programOptions} 
+          onChange={handleProgramChange}
+          isClearable 
+          placeholder="Select program..." 
           className="custom-select"
-        >
-          <option value="">All Programs</option>
-          {programs.map(program => (
-            <option key={program} value={program}>{program}</option>
-          ))}
-        </select>
+        />
 
         <Select 
           id="companyFilter" 
           options={companyOptions} 
-          onChange={handleSearch} 
+          onChange={handleCompanyChange} 
           isClearable 
           placeholder="Search company..." 
-          className="search-select"
+          className="custom-select"
+        />
+
+        <Select 
+          id="monthFilter" 
+          options={monthOptions} 
+          onChange={handleMonthChange} 
+          isClearable 
+          placeholder="Select month..." 
+          className="custom-select"
         />
       </div>
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
-          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
+          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.asset_image}`;
           console.log('Image URL:', imageUrl);  // Log the image URL for debugging
           return (
             <div className="image-container" key={article.id}>
               <img 
                 src={imageUrl} 
-                alt={article.program_detail || 'No Image'} 
+                alt={article.program_name ? article.program_name.join(', ') : 'No Image'} 
                 style={{ maxWidth: '200px', height: 'auto' }} 
                 onError={(e) => { e.target.style.display = 'none'; console.log('Error loading image:', imageUrl); }}
                 onClick={() => downloadImage(imageUrl)}
