@@ -1,76 +1,76 @@
 body {
-    background-color: #004246;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+  background-color: #004246;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .filters {
-    text-align: center;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 .custom-select {
-    width: 200px;
-    font-size: 16px;
-    border-radius: 8px;
-    padding: 10px;
-    border: 1px solid #ccc;
+  width: 200px;
+  font-size: 16px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
 }
 
 .images-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .image-container {
-    width: calc(25% - 20px);
-    padding: 10px;
-    box-sizing: border-box;
-    position: relative;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
+  width: calc(25% - 20px);
+  padding: 10px;
+  box-sizing: border-box;
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .image-container img {
-    width: 100%;
-    height: auto;
-    display: block;
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .image-container:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .image-container .tooltip {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    font-size: 12px;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .image-container:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
