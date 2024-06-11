@@ -133,7 +133,7 @@ function App() {
                 src={imageUrl} 
                 alt={article.program_detail || 'No Image'} 
                 effect="blur"
-                style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
+                style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
                 onError={(e) => { e.target.style.display = 'none'; }} 
                 onClick={() => downloadImage(imageUrl)}
               />
