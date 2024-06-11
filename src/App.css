@@ -31,12 +31,17 @@ body {
 }
 
 .images-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+  justify-content: center;
 }
 
 .image-container {
+  width: calc(25% - 20px);
+  min-width: 200px;
+  padding: 10px;
+  box-sizing: border-box;
   position: relative;
   border-radius: 8px;
   overflow: hidden;
