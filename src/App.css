@@ -127,12 +127,22 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
+  max-width: 80%;
+  max-height: 80%;
+  overflow: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
 .modal-content .tooltip {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
+  top: 10px;
+  right: 10px;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 5px;
