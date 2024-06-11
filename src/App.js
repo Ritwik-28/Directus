@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Select from 'react-select';
 import './App.css';
 import { format } from 'date-fns';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 function App() {
   const [articles, setArticles] = useState([]);
@@ -127,9 +129,10 @@ function App() {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           return (
             <div className="image-container" key={article.id}>
-              <img 
+              <LazyLoadImage 
                 src={imageUrl} 
                 alt={article.program_detail || 'No Image'} 
+                effect="blur"
                 style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }} 
                 onError={(e) => { e.target.style.display = 'none'; }} 
                 onClick={() => downloadImage(imageUrl)}
