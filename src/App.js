@@ -9,6 +9,7 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [filters, setFilters] = useState({ program: '', company: '', month: '' });
+  const [modalImage, setModalImage] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +66,14 @@ function App() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleImageClick = (url) => {
+    setModalImage(url);
+  };
+
+  const handleCloseModal = () => {
+    setModalImage(null);
   };
 
   const filteredPrograms = useMemo(() => {
@@ -135,13 +144,28 @@ function App() {
                 effect="blur"
                 style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
                 onError={(e) => { e.target.style.display = 'none'; }} 
-                onClick={() => downloadImage(imageUrl)}
+                onClick={() => handleImageClick(imageUrl)}
               />
-              <div className="tooltip">Click to download</div>
+              <div className="tooltip">Click to Open</div>
             </div>
           );
         })}
       </div>
+
+      {modalImage && (
+        <div className="modal" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <LazyLoadImage 
+              src={modalImage} 
+              alt="Modal" 
+              effect="blur"
+              style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
+              onClick={() => downloadImage(modalImage)}
+            />
+            <div className="tooltip">Click to Download</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
