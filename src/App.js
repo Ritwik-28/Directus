@@ -101,9 +101,10 @@ function App() {
   }, [filteredArticles]);
 
   const filteredMonths = useMemo(() => {
-    const uniqueMonths = [...new Set(filteredArticles.map(article => new Date(article.month)))];
-    uniqueMonths.sort(compareDesc);
-    return uniqueMonths.map(date => format(date, 'MMMM yyyy'));
+    const uniqueMonths = new Set(filteredArticles.map(article => format(new Date(article.month), 'MMMM yyyy')));
+    const uniqueMonthsArray = Array.from(uniqueMonths).map(dateString => new Date(dateString + ' 1, 2024'));
+    uniqueMonthsArray.sort(compareDesc);
+    return uniqueMonthsArray.map(date => format(date, 'MMMM yyyy'));
   }, [filteredArticles]);
 
   const programOptions = useMemo(() => filteredPrograms.map(program => ({
