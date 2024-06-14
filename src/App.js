@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Select from 'react-select';
 import './App.css';
-import { format } from 'date-fns';
+import { format, compareDesc } from 'date-fns';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
@@ -101,7 +101,9 @@ function App() {
   }, [filteredArticles]);
 
   const filteredMonths = useMemo(() => {
-    return [...new Set(filteredArticles.map(article => format(new Date(article.month), 'MMMM yyyy')))];
+    const uniqueMonths = [...new Set(filteredArticles.map(article => new Date(article.month)))];
+    uniqueMonths.sort(compareDesc);
+    return uniqueMonths.map(date => format(date, 'MMMM yyyy'));
   }, [filteredArticles]);
 
   const programOptions = useMemo(() => filteredPrograms.map(program => ({
