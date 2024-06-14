@@ -5,18 +5,52 @@ body {
   padding: 0;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #c1c1c176;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 2px solid #004246;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffffb3; /* Lighter shade on hover */
+}
+
 .container {
   width: 80%;
   margin: 0 auto;
   padding: 20px;
+  cursor: pointer;
 }
 
+/* Fancy Filters */
 .filters {
   text-align: center;
   margin-bottom: 20px;
   display: flex;
   justify-content: center;
   gap: 20px;
+  padding: 20px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #009688, #004d40);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.filters:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 .custom-select {
@@ -28,6 +62,7 @@ body {
   background-color: #fff;
   color: #333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .images-grid {
@@ -35,6 +70,7 @@ body {
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  cursor: pointer;
 }
 
 .image-container {
@@ -46,6 +82,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
 
 .image-container img {
@@ -58,6 +95,7 @@ body {
 .image-container:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .image-container .tooltip {
@@ -84,12 +122,14 @@ body {
   border-radius: 4px;
   padding: 5px;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .custom-select__menu {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .custom-select__option--is-selected {
@@ -99,14 +139,21 @@ body {
 
 .custom-select__option--is-focused {
   background-color: #e9ecef;
+  cursor: pointer;
 }
 
 .custom-select__placeholder {
   color: #6c757d;
+  cursor: pointer;
 }
 
 .custom-select__single-value {
   color: #495057;
+  cursor: pointer;
+}
+
+.css-13cymwt-control {
+  cursor: pointer;
 }
 
 .modal {
@@ -140,6 +187,7 @@ body {
   max-height: 80vh;
   height: auto;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .modal-content .tooltip {
