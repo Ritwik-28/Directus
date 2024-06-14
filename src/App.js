@@ -10,33 +10,52 @@ function App() {
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [filters, setFilters] = useState({ program: '', company: '', month: '' });
   const [modalImage, setModalImage] = useState(null);
+  const batchSize = 20;
+  const [currentBatch, setCurrentBatch] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const tokenRes = await fetch('/api/getAccessToken');
-        if (!tokenRes.ok) {
-          throw new Error('Failed to fetch access token');
-        }
-        const tokenData = await tokenRes.json();
+    const cachedArticles = JSON.parse(localStorage.getItem('articles'));
+    const cacheTimestamp = localStorage.getItem('cacheTimestamp');
+    const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
 
-        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}`);
-        if (!contentRes.ok) {
-          throw new Error('Failed to fetch content');
-        }
-        const contentData = await contentRes.json();
-
-        const articlesData = Array.isArray(contentData) ? contentData : [];
-        setArticles(articlesData);
-        setFilteredArticles(articlesData);
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
+    if (cachedArticles && cacheTimestamp && (Date.now() - cacheTimestamp < cacheExpiry)) {
+      setArticles(cachedArticles);
+      setFilteredArticles(cachedArticles);
+      setCurrentBatch(cachedArticles.slice(0, batchSize));
+    } else {
+      fetchData();
+      localStorage.setItem('cacheTimestamp', Date.now());
+    }
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const tokenRes = await fetch('/api/getAccessToken');
+      if (!tokenRes.ok) {
+        throw new Error('Failed to fetch access token');
+      }
+      const tokenData = await tokenRes.json();
+
+      const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}`);
+      if (!contentRes.ok) {
+        throw new Error('Failed to fetch content');
+      }
+      const contentData = await contentRes.json();
+
+      const articlesData = Array.isArray(contentData) ? contentData : [];
+      setArticles(articlesData);
+      setFilteredArticles(articlesData);
+      setCurrentBatch(articlesData.slice(0, batchSize));
+      
+      const cachedArticles = JSON.parse(localStorage.getItem('articles'));
+      if (JSON.stringify(cachedArticles) !== JSON.stringify(articlesData)) {
+        localStorage.setItem('articles', JSON.stringify(articlesData));
+      }
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
     const filterContent = () => {
@@ -47,6 +66,7 @@ function App() {
                (!filters.month || articleMonth === filters.month);
       });
       setFilteredArticles(filtered);
+      setCurrentBatch(filtered.slice(0, batchSize));
     };
 
     filterContent();
@@ -103,6 +123,15 @@ function App() {
     label: month
   })), [filteredMonths]);
 
+  const loadMoreImages = () => {
+    const nextBatch = filteredArticles.slice(currentBatch.length, currentBatch.length + batchSize);
+    if (nextBatch.length === 0) {
+      return;
+    } else {
+      setCurrentBatch((prevBatch) => [...prevBatch, ...nextBatch]);
+    }
+  };
+
   return (
     <div className="container">
       <div className="filters">
@@ -134,7 +163,7 @@ function App() {
         />
       </div>
       <div className="images-grid" id="imagesGrid">
-        {filteredArticles.map(article => {
+        {currentBatch.map(article => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           return (
             <div className="image-container" key={article.id}>
@@ -151,6 +180,12 @@ function App() {
           );
         })}
       </div>
+
+      {currentBatch.length < filteredArticles.length && (
+        <div className="load-more" onClick={loadMoreImages}>
+          Load More
+        </div>
+      )}
 
       {modalImage && (
         <div className="modal" onClick={handleCloseModal}>
