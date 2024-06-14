@@ -3,6 +3,7 @@ import Select from 'react-select';
 import './App.css';
 import { format } from 'date-fns';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   const [modalImage, setModalImage] = useState(null);
   const batchSize = 20;
   const [currentBatch, setCurrentBatch] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     const cachedArticles = JSON.parse(localStorage.getItem('articles'));
@@ -126,6 +128,7 @@ function App() {
   const loadMoreImages = () => {
     const nextBatch = filteredArticles.slice(currentBatch.length, currentBatch.length + batchSize);
     if (nextBatch.length === 0) {
+      setHasMore(false);
       return;
     } else {
       setCurrentBatch((prevBatch) => [...prevBatch, ...nextBatch]);
@@ -162,30 +165,32 @@ function App() {
           classNamePrefix="custom-select"
         />
       </div>
-      <div className="images-grid" id="imagesGrid">
-        {currentBatch.map(article => {
-          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          return (
-            <div className="image-container" key={article.id}>
-              <LazyLoadImage 
-                src={imageUrl} 
-                alt={article.program_detail || 'No Image'} 
-                effect="blur"
-                style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
-                onError={(e) => { e.target.style.display = 'none'; }} 
-                onClick={() => handleImageClick(imageUrl)}
-              />
-              <div className="tooltip">Click to Open</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {currentBatch.length < filteredArticles.length && (
-        <div className="load-more" onClick={loadMoreImages}>
-          Load More
+      <InfiniteScroll
+        dataLength={currentBatch.length}
+        next={loadMoreImages}
+        hasMore={hasMore}
+        loader={<h4>Loading...</h4>}
+        endMessage={<p>No more images</p>}
+      >
+        <div className="images-grid" id="imagesGrid">
+          {currentBatch.map(article => {
+            const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
+            return (
+              <div className="image-container" key={article.id}>
+                <LazyLoadImage 
+                  src={imageUrl} 
+                  alt={article.program_detail || 'No Image'} 
+                  effect="blur"
+                  style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
+                  onError={(e) => { e.target.style.display = 'none'; }} 
+                  onClick={() => handleImageClick(imageUrl)}
+                />
+                <div className="tooltip">Click to Open</div>
+              </div>
+            );
+          })}
         </div>
-      )}
+      </InfiniteScroll>
 
       {modalImage && (
         <div className="modal" onClick={handleCloseModal}>
