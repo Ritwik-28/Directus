@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Select from 'react-select';
 import './App.css';
 import { format } from 'date-fns';
@@ -10,6 +10,7 @@ function App() {
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [filters, setFilters] = useState({ program: '', company: '', month: '' });
   const [modalImage, setModalImage] = useState(null);
+  const tooltipRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,6 +104,14 @@ function App() {
     label: month
   })), [filteredMonths]);
 
+  const handleMouseMove = (e, container) => {
+    const tooltip = container.querySelector('.tooltip');
+    if (tooltip) {
+      tooltip.style.left = `${e.clientX - container.getBoundingClientRect().left}px`;
+      tooltip.style.top = `${e.clientY - container.getBoundingClientRect().top}px`;
+    }
+  };
+
   return (
     <div className="container">
       <div className="filters">
@@ -137,7 +146,11 @@ function App() {
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           return (
-            <div className="image-container" key={article.id}>
+            <div 
+              className="image-container" 
+              key={article.id} 
+              onMouseMove={(e) => handleMouseMove(e, e.currentTarget)}
+            >
               <LazyLoadImage 
                 src={imageUrl} 
                 alt={article.program_detail || 'No Image'} 
