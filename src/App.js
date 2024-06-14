@@ -10,7 +10,7 @@ function App() {
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [filters, setFilters] = useState({ program: '', company: '', month: '' });
   const [modalImage, setModalImage] = useState(null);
-  const tooltipRef = useRef(null);
+  const modalTooltipRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +77,21 @@ function App() {
     setModalImage(null);
   };
 
+  const handleMouseMove = (e, container) => {
+    const tooltip = container.querySelector('.tooltip');
+    if (tooltip) {
+      tooltip.style.left = `${e.clientX - container.getBoundingClientRect().left}px`;
+      tooltip.style.top = `${e.clientY - container.getBoundingClientRect().top}px`;
+    }
+  };
+
+  const handleModalMouseMove = (e) => {
+    if (modalTooltipRef.current) {
+      modalTooltipRef.current.style.left = `${e.clientX - e.currentTarget.getBoundingClientRect().left}px`;
+      modalTooltipRef.current.style.top = `${e.clientY - e.currentTarget.getBoundingClientRect().top}px`;
+    }
+  };
+
   const filteredPrograms = useMemo(() => {
     return [...new Set(filteredArticles.map(article => article.program_detail))];
   }, [filteredArticles]);
@@ -103,14 +118,6 @@ function App() {
     value: month,
     label: month
   })), [filteredMonths]);
-
-  const handleMouseMove = (e, container) => {
-    const tooltip = container.querySelector('.tooltip');
-    if (tooltip) {
-      tooltip.style.left = `${e.clientX - container.getBoundingClientRect().left}px`;
-      tooltip.style.top = `${e.clientY - container.getBoundingClientRect().top}px`;
-    }
-  };
 
   return (
     <div className="container">
@@ -167,7 +174,7 @@ function App() {
 
       {modalImage && (
         <div className="modal" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} onMouseMove={handleModalMouseMove}>
             <LazyLoadImage 
               src={modalImage} 
               alt="Modal" 
@@ -175,7 +182,7 @@ function App() {
               style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
               onClick={() => downloadImage(modalImage)}
             />
-            <div className="tooltip">Click to Download</div>
+            <div className="tooltip" ref={modalTooltipRef}>Click to Download</div>
           </div>
         </div>
       )}
