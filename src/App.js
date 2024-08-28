@@ -62,14 +62,14 @@ function App() {
     }));
   };
 
-  const downloadImage = (url) => {
-    const link = document.createElement('a');
-    link.href = `${url}?download=true`;
-    link.download = url.substring(url.lastIndexOf('/') + 1);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  // const downloadImage = (url) => {
+  //   const link = document.createElement('a');
+  //   link.href = `${url}?download=true`;
+  //   link.download = url.substring(url.lastIndexOf('/') + 1);
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
 
   const handleImageClick = (url) => {
     setModalImage(url);
@@ -164,9 +164,9 @@ function App() {
               alt="Modal" 
               effect="blur"
               style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
-              onClick={() => downloadImage(modalImage)}
+              // onClick={() => downloadImage(modalImage)}
             />
-            <div className="tooltip" ref={modalTooltipRef}>Click to Download</div>
+            {/* <div className="tooltip" ref={modalTooltipRef}>Click to Download</div> */}
           </div>
         </div>
       )}
