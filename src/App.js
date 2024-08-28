@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Select from 'react-select';
 import './App.css';
-import { format, compareDesc, subMonths, isAfter } from 'date-fns';
+import { format, compareDesc, subMonths, isAfter, startOfMonth } from 'date-fns';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
@@ -41,13 +41,15 @@ function App() {
 
   useEffect(() => {
     const filterContent = () => {
-      const sixMonthsAgo = subMonths(new Date(), 5);
+      const currentDate = new Date();
+      const fiveMonthsAgo = subMonths(startOfMonth(currentDate), 5);
 
       const filtered = articles.filter(article => {
         const articleMonth = new Date(article.month);
         return (!filters.program || article.program_detail === filters.program) &&
                (!filters.company || article.company_name === filters.company) &&
-               isAfter(articleMonth, sixMonthsAgo);
+               isAfter(articleMonth, fiveMonthsAgo) &&
+               !isAfter(articleMonth, currentDate);
       });
       setFilteredArticles(filtered);
     };
@@ -62,14 +64,14 @@ function App() {
     }));
   };
 
-  // const downloadImage = (url) => {
-  //   const link = document.createElement('a');
-  //   link.href = `${url}?download=true`;
-  //   link.download = url.substring(url.lastIndexOf('/') + 1);
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
+  const downloadImage = (url) => {
+    const link = document.createElement('a');
+    link.href = `${url}?download=true`;
+    link.download = url.substring(url.lastIndexOf('/') + 1);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleImageClick = (url) => {
     setModalImage(url);
@@ -164,9 +166,9 @@ function App() {
               alt="Modal" 
               effect="blur"
               style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
-              // onClick={() => downloadImage(modalImage)}
+              onClick={() => downloadImage(modalImage)}
             />
-            {/* <div className="tooltip" ref={modalTooltipRef}>Click to Download</div> */}
+            <div className="tooltip" ref={modalTooltipRef}>Click to Download</div>
           </div>
         </div>
       )}
