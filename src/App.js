@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Select from 'react-select';
 import './App.css';
-import { format, compareDesc } from 'date-fns';
+import { format, compareDesc, subMonths, isAfter } from 'date-fns';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 function App() {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
-  const [filters, setFilters] = useState({ program: '', company: '', month: '' });
+  const [filters, setFilters] = useState({ program: '', company: '' });
   const [modalImage, setModalImage] = useState(null);
   const modalTooltipRef = useRef(null);
 
@@ -41,11 +41,13 @@ function App() {
 
   useEffect(() => {
     const filterContent = () => {
+      const sixMonthsAgo = subMonths(new Date(), 5);
+
       const filtered = articles.filter(article => {
-        const articleMonth = format(new Date(article.month), 'MMMM yyyy');
+        const articleMonth = new Date(article.month);
         return (!filters.program || article.program_detail === filters.program) &&
                (!filters.company || article.company_name === filters.company) &&
-               (!filters.month || articleMonth === filters.month);
+               isAfter(articleMonth, sixMonthsAgo);
       });
       setFilteredArticles(filtered);
     };
@@ -100,13 +102,6 @@ function App() {
     return [...new Set(filteredArticles.map(article => article.company_name))];
   }, [filteredArticles]);
 
-  const filteredMonths = useMemo(() => {
-    const uniqueMonths = new Set(filteredArticles.map(article => format(new Date(article.month), 'MMMM yyyy')));
-    const uniqueMonthsArray = Array.from(uniqueMonths).map(dateString => new Date(dateString + ' 1, 2024'));
-    uniqueMonthsArray.sort(compareDesc);
-    return uniqueMonthsArray.map(date => format(date, 'MMMM yyyy'));
-  }, [filteredArticles]);
-
   const programOptions = useMemo(() => filteredPrograms.map(program => ({
     value: program,
     label: program
@@ -116,11 +111,6 @@ function App() {
     value: company,
     label: company
   })), [filteredCompanies]);
-
-  const monthOptions = useMemo(() => filteredMonths.map(month => ({
-    value: month,
-    label: month
-  })), [filteredMonths]);
 
   return (
     <div className="container">
@@ -139,15 +129,6 @@ function App() {
           onChange={selectedOption => handleFilterChange(selectedOption, 'company')} 
           isClearable 
           placeholder="Search Company Name" 
-          className="custom-select"
-          classNamePrefix="custom-select"
-        />
-
-        <Select 
-          options={monthOptions} 
-          onChange={selectedOption => handleFilterChange(selectedOption, 'month')} 
-          isClearable 
-          placeholder="Select Placement Month" 
           className="custom-select"
           classNamePrefix="custom-select"
         />
