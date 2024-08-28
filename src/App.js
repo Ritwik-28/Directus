@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Select from 'react-select';
 import './App.css';
-import { format, compareDesc, subMonths, isAfter, startOfMonth } from 'date-fns';
+import { parseISO, compareDesc, subMonths, isAfter, startOfMonth } from 'date-fns';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
@@ -10,7 +10,6 @@ function App() {
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [filters, setFilters] = useState({ program: '', company: '' });
   const [modalImage, setModalImage] = useState(null);
-  const modalTooltipRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,8 +27,12 @@ function App() {
         const contentData = await contentRes.json();
 
         const articlesData = Array.isArray(contentData) ? contentData : [];
-        setArticles(articlesData);
-        setFilteredArticles(articlesData);
+        // Sort articles by date, latest first
+        const sortedArticles = articlesData.sort((a, b) => 
+          compareDesc(parseISO(a.month), parseISO(b.month))
+        );
+        setArticles(sortedArticles);
+        setFilteredArticles(sortedArticles);
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -45,7 +48,7 @@ function App() {
       const fiveMonthsAgo = subMonths(startOfMonth(currentDate), 5);
 
       const filtered = articles.filter(article => {
-        const articleMonth = new Date(article.month);
+        const articleMonth = parseISO(article.month);
         return (!filters.program || article.program_detail === filters.program) &&
                (!filters.company || article.company_name === filters.company) &&
                isAfter(articleMonth, fiveMonthsAgo) &&
@@ -64,15 +67,6 @@ function App() {
     }));
   };
 
-  const downloadImage = (url) => {
-    const link = document.createElement('a');
-    link.href = `${url}?download=true`;
-    link.download = url.substring(url.lastIndexOf('/') + 1);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const handleImageClick = (url) => {
     setModalImage(url);
   };
@@ -86,13 +80,6 @@ function App() {
     if (tooltip) {
       tooltip.style.left = `${e.clientX - container.getBoundingClientRect().left}px`;
       tooltip.style.top = `${e.clientY - container.getBoundingClientRect().top}px`;
-    }
-  };
-
-  const handleModalMouseMove = (e) => {
-    if (modalTooltipRef.current) {
-      modalTooltipRef.current.style.left = `${e.clientX - e.currentTarget.getBoundingClientRect().left}px`;
-      modalTooltipRef.current.style.top = `${e.clientY - e.currentTarget.getBoundingClientRect().top}px`;
     }
   };
 
@@ -160,15 +147,13 @@ function App() {
 
       {modalImage && (
         <div className="modal" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} onMouseMove={handleModalMouseMove}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <LazyLoadImage 
               src={modalImage} 
               alt="Modal" 
               effect="blur"
               style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
-              onClick={() => downloadImage(modalImage)}
             />
-            <div className="tooltip" ref={modalTooltipRef}>Click to Download</div>
           </div>
         </div>
       )}
