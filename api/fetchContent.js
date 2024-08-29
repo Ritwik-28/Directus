@@ -1,27 +1,6 @@
-const fetchAllPages = async (token) => {
-  let allData = [];
-  let page = 1;
-  let hasMore = true;
+const fetch = require('node-fetch');
 
-  while (hasMore) {
-    const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published&limit=100&page=${page}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch content: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    allData = allData.concat(data.data);
-    hasMore = data.meta.page < data.meta.pageCount; // Adjust depending on the metadata structure
-    page += 1;
-  }
-
-  return allData;
-};
+const directusApiEndpoint = process.env.REACT_APP_DIRECTUS_API_ENDPOINT;
 
 module.exports = async (req, res) => {
   const { token } = req.query;
@@ -30,11 +9,26 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Token is required' });
   }
 
+  if (typeof token !== 'string' || token.trim() === '') {
+    return res.status(400).json({ error: 'Invalid token format' });
+  }
+
   try {
-    const data = await fetchAllPages(token);
-    res.status(200).json(data);
+    const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      timeout: 5000, // optional timeout in milliseconds
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch content: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    res.status(200).json(data.data);
   } catch (error) {
     console.error('Error fetching content:', error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
