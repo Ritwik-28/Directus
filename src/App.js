@@ -20,8 +20,7 @@ function App() {
         }
         const tokenData = await tokenRes.json();
 
-        // Fetch all content with no limit or offset
-        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=0`);
+        const contentRes = await fetch(/api/fetchContent?token=${tokenData.token});
         if (!contentRes.ok) {
           throw new Error('Failed to fetch content');
         }
@@ -79,8 +78,8 @@ function App() {
   const handleMouseMove = (e, container) => {
     const tooltip = container.querySelector('.tooltip');
     if (tooltip) {
-      tooltip.style.left = `${e.clientX - container.getBoundingClientRect().left}px`;
-      tooltip.style.top = `${e.clientY - container.getBoundingClientRect().top}px`;
+      tooltip.style.left = ${e.clientX - container.getBoundingClientRect().left}px;
+      tooltip.style.top = ${e.clientY - container.getBoundingClientRect().top}px;
     }
   };
 
@@ -125,9 +124,8 @@ function App() {
       </div>
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
-          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          // Render only if imageUrl exists
-          return article.learner_image ? (
+          const imageUrl = ${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image};
+          return (
             <div 
               className="image-container" 
               key={article.id} 
@@ -143,7 +141,7 @@ function App() {
               />
               <div className="tooltip">Click to Open</div>
             </div>
-          ) : null;
+          );
         })}
       </div>
 
