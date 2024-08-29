@@ -20,7 +20,8 @@ function App() {
         }
         const tokenData = await tokenRes.json();
 
-        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}`);
+        // Assuming your backend is set up to handle no limits/offsets by fetching all data
+        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=0`);
         if (!contentRes.ok) {
           throw new Error('Failed to fetch content');
         }
