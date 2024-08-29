@@ -21,7 +21,7 @@ function App() {
         const tokenData = await tokenRes.json();
 
         // Fetch all content with no limit or offset
-        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=242`); // Adjust limit as needed
+        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=-1`); // Adjust limit as needed
         if (!contentRes.ok) {
           throw new Error('Failed to fetch content');
         }
