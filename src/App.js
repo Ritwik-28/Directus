@@ -20,7 +20,7 @@ function App() {
         }
         const tokenData = await tokenRes.json();
 
-        // Assuming your backend is set up to handle no limits/offsets by fetching all data
+        // Fetch all content with no limit or offset
         const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=0`);
         if (!contentRes.ok) {
           throw new Error('Failed to fetch content');
@@ -126,7 +126,8 @@ function App() {
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          return (
+          // Render only if imageUrl exists
+          return article.learner_image ? (
             <div 
               className="image-container" 
               key={article.id} 
@@ -142,7 +143,7 @@ function App() {
               />
               <div className="tooltip">Click to Open</div>
             </div>
-          );
+          ) : null;
         })}
       </div>
 
