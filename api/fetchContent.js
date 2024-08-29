@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published`, {
+    const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published&limit=-1`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
