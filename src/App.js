@@ -20,15 +20,13 @@ function App() {
         }
         const tokenData = await tokenRes.json();
 
-        // Fetch all content with no limit or offset
-        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=-1`); // Adjust limit as needed
+        const contentRes = await fetch(`/api/fetchContent?token=${tokenData.token}&limit=-1`);
         if (!contentRes.ok) {
           throw new Error('Failed to fetch content');
         }
         const contentData = await contentRes.json();
 
         const articlesData = Array.isArray(contentData) ? contentData : [];
-        // Sort articles by date, latest first
         const sortedArticles = articlesData.sort((a, b) => 
           compareDesc(parseISO(a.month), parseISO(b.month))
         );
@@ -37,6 +35,7 @@ function App() {
 
       } catch (error) {
         console.error('Error fetching data:', error);
+        alert('Failed to load content. Please try again later.');
       }
     };
 
@@ -126,8 +125,10 @@ function App() {
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
           const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
-          // Render only if imageUrl exists
-          return article.learner_image ? (
+          if (!article.learner_image) {
+            return null; // Do not render card if no image URL
+          }
+          return (
             <div 
               className="image-container" 
               key={article.id} 
@@ -138,12 +139,12 @@ function App() {
                 alt={article.program_detail || 'No Image'} 
                 effect="blur"
                 style={{ width: '100%', height: 'auto', borderRadius: '8px' }} 
-                onError={(e) => { e.target.style.display = 'none'; }} 
+                onError={(e) => { e.target.closest('.image-container').style.display = 'none'; }} // Hide card on image load failure
                 onClick={() => handleImageClick(imageUrl)}
               />
               <div className="tooltip">Click to Open</div>
             </div>
-          ) : null;
+          );
         })}
       </div>
 
