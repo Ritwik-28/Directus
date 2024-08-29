@@ -10,35 +10,18 @@ module.exports = async (req, res) => {
   }
 
   try {
-    let allData = [];
-    let page = 1;
-    let hasMore = true;
+    const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-    while (hasMore) {
-      const response = await fetch(`${directusApiEndpoint}/items/success_stories?filter[status][_eq]=published&limit=100&page=${page}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch content: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      // Accumulate the fetched data
-      allData = allData.concat(data.data);
-
-      // Check if there's more data to fetch
-      if (data.data.length < 100) {
-        hasMore = false;
-      } else {
-        page += 1; // Move to the next page
-      }
+    if (!response.ok) {
+      throw new Error(`Failed to fetch content: ${response.statusText}`);
     }
 
-    res.status(200).json(allData);
+    const data = await response.json();
+    res.status(200).json(data.data);
   } catch (error) {
     console.error('Error fetching content:', error.message);
     res.status(500).json({ error: error.message });
