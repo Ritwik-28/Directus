@@ -124,7 +124,7 @@ function App() {
       </div>
       <div className="images-grid" id="imagesGrid">
         {filteredArticles.map(article => {
-          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}.webp`;
+          const imageUrl = `${process.env.REACT_APP_DIRECTUS_API_ENDPOINT}/assets/${article.learner_image}`;
           if (!article.learner_image) {
             return null; // Do not render card if no image URL
           }
